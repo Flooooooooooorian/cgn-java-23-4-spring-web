@@ -2,36 +2,36 @@ package de.neuefische.cgnjava234springweb.hello;
 
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
 public class ProductController {
+    private final ProductRepo productRepo;
 
-    List<Product> products = new ArrayList<>();
+    public ProductController(ProductRepo productRepo) {
+        this.productRepo = productRepo;
+    }
 
     @GetMapping("/api/products")
     public List<Product> getAllProducts() {
-        return products;
+        return productRepo.findAll();
     }
 
     @GetMapping("/api/products/{id}")
     public Product getProductById(@PathVariable String id) {
-        return products.stream()
-                .filter(product -> product.getId().equals(id))
-                .findAny()
+        return productRepo.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Product with id: " + id + " not found!"));
     }
 
-    @PostMapping("/api/product")
+    @PostMapping("/api/products")
     public Product postProduct(@RequestBody Product product) {
-        products.add(product);
+        productRepo.save(product);
         return product;
     }
 
-    @DeleteMapping("/api/product/{id}")
+    @DeleteMapping("/api/products/{id}")
     public void deleteProductById(@PathVariable String id ){
-        products.removeIf(product -> product.getId().equals(id));
+        productRepo.deleteById(id);
     }
 }
